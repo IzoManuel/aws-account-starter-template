@@ -5,7 +5,6 @@ Resources:
   MFAUserGroup:
     Type: AWS::IAM::Group
     Properties:
-      GroupName: "MFAEnforcedGroup"
       Policies:
         - PolicyName: "MFAEnforcement"
           PolicyDocument:
