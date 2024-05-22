@@ -47,4 +47,3 @@ Outputs:
     Value: !Ref MFAUserGroup
     Export:
       Name: MFAUserGroup
-
