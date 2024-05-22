@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Enforce MFA for IAM users
+
+Resources:
+  MFAUserGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "MFAEnforcedGroup"
+      Policies:
+        - PolicyName: "MFAEnforcement"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:CreateVirtualMFADevice
+                  - iam:EnableMFADevice
+                  - iam:ResyncMFADevice
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - sts:GetSessionToken
+                Condition:
+                  BoolIfExists:
+                    aws:MultiFactorAuthPresent: "true"
+                Resource: "*"
+
+  MFAUserPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "MFAUserPolicy"
+      Groups:
+        - Ref: MFAUserGroup
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: "*"
+            Resource: "*"
+            Condition:
+              BoolIfExists:
+                aws:MultiFactorAuthPresent: "false"
+
+Outputs:
+  MFAUserGroup:
+    Description: "IAM Group with MFA enforced"
+    Value: !Ref MFAUserGroup
+    Export:
+      Name: MFAUserGroup
+
